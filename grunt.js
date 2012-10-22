@@ -7,8 +7,8 @@ module.exports = function (grunt) {
         },
         min: {
             dist: {
-                src: ["<banner>", "src/smoothscroll.js"],
-                dest: "dist/smoothscroll.min.js"
+                src: ["<banner>", "src/socialbuttons.js"],
+                dest: "dist/socialbuttons.min.js"
             }
         },
         lint: {
