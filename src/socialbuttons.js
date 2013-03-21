@@ -11,18 +11,45 @@
     var event = {},
         loadFlg = false,
         pretreatmentFunc = {},
-        qsaSupport;
+        aftertreatmentFunc = {},
+        qsaSupport,
+        currentUrl = location.href;
 
     pretreatmentFunc = {
-        addFbroot: function () {
+        facebook: function () {
             var elem = document.getElementById("socialbox"),
                 div = document.createElement("div");
 
             div.id = "fb-root";
             elem.parentNode.insertBefore(div, elem);
+
+            window.fbAsyncInit = function () {
+                FB.Event.subscribe("edge.create", function (targetUrl) {
+                    _gaq.push(['_trackSocial', 'facebook', 'like', targetUrl]);
+                });
+            };
         },
-        addGPlusVar: function () {
+        google: function () {
             window.___gcfg = { lang: 'ja' };
+        }
+    };
+
+    aftertreatmentFunc = {
+        twitter: function () {
+            window.twttr = window.twttr || {
+                _e: [],
+                ready: function (f) {
+                    window.twttr._e.push(f);
+                }
+            };
+
+            window.twttr.ready(function (twttr) {
+                twttr.events.bind("tweet", function (intentEvent) {
+                    if (intentEvent) {
+                        _gaq.push(["_trackSocial", "twitter", "tweet", currentUrl]);
+                    }
+                });
+            });
         }
     };
 
@@ -45,9 +72,9 @@
     };
 
     function loadJS() {
-        var scripts = [{ "src": "//platform.twitter.com/widgets.js", "id": "twitter-wjs" },
-                       { "src": "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=153769271381829", "id": "facebook-jssdk", "pretreatment": "addFbroot" },
-                       { "src": "https://apis.google.com/js/plusone.js", "pretreatment": "addGPlusVar" },
+        var scripts = [{ "src": "//platform.twitter.com/widgets.js", "id": "twitter-wjs", "aftertreatment": "twitter" },
+                       { "src": "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=[Set your appId]", "id": "facebook-jssdk", "pretreatment": "facebook" },
+                       { "src": "https://apis.google.com/js/plusone.js", "pretreatment": "google" },
                        { "src": "http://b.st-hatena.com/js/bookmark_button.js" },
                        { "src": "http://static.evernote.com/noteit.js" }
                       ],
@@ -75,6 +102,10 @@
                 script.id = scripts[i].id;
             }
             fScript.parentNode.insertBefore(script, fScript);
+
+            if (scripts[i].aftertreatment) {
+                aftertreatmentFunc[scripts[i].aftertreatment].call();
+            }
         }
 
         event.remove(window, "scroll", dispSocial);
