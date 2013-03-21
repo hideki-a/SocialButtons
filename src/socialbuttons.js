@@ -1,7 +1,7 @@
 /*!*
  * Social Buttons
- * Version 1.0.0
- * Copyright (c) 2012 Hideki Abe
+ * Version 1.1.0
+ * Copyright (c) 2013 Hideki Abe
  *
  * Dual licensed under the MIT and GPL licenses.
  */
